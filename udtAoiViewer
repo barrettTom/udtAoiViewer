@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QTreeView, QHeaderView, QFileDialog, QSplitter
+
+from lib.TreeModel import TreeModel
+import sys
+
+class udtAoiViewer(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.frame = QSplitter()
+        self.setCentralWidget(self.frame)
+
+        self.projectView = QTreeView(self) 
+        self.templateView = QTreeView(self) 
+        self.projectView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.templateView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+        self.frame.addWidget(self.projectView)
+        self.frame.addWidget(self.templateView)
+
+        self.projectModel = False
+        self.templateModel = False
+
+        menu = self.menuBar()
+        fileMenu = menu.addMenu('&File')
+        viewMenu = menu.addMenu('&View')
+
+        openProjectButton = QAction("&Open Project", self)
+        openProjectButton.triggered.connect(self.openProject)
+        fileMenu.addAction(openProjectButton)
+
+        openTemplateButton = QAction("&Open Template", self)
+        openTemplateButton.triggered.connect(self.openTemplate)
+        fileMenu.addAction(openTemplateButton)
+
+        highlightButton = QAction("&Highlight Inconsistencies", self)
+        highlightButton.triggered.connect(self.highlight)
+        viewMenu.addAction(highlightButton)
+
+        if len(sys.argv) == 3:
+            self.openTemplate(sys.argv[1])
+            self.openProject(sys.argv[2])
+
+        self.show()
+
+    def openProject(self, f = None):
+        if not f:
+            path = QFileDialog.getOpenFileName(self)[0]
+        else:
+            path = f
+
+        if path:
+            self.projectModel = TreeModel(path)
+            self.projectView.setModel(self.projectModel)
+
+    def openTemplate(self, f = None):
+        if not f:
+            path = QFileDialog.getOpenFileName(self)[0]
+        else:
+            path = f
+
+        if path:
+            self.templateModel = TreeModel(path)
+            self.templateView.setModel(self.templateModel)
+
+    def highlight(self):
+        if self.model:
+            self.model.highlight()
+
+app = QApplication(sys.argv)
+masterView = udtAoiViewer()
+sys.exit(app.exec_())
