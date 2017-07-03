@@ -15,8 +15,12 @@ class udtAoiViewer(QMainWindow):
 
         self.projectView = QTreeView(self) 
         self.templateView = QTreeView(self) 
+
         self.projectView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.templateView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+        self.templateView.header().hide()
+        self.projectView.header().hide()
 
         self.frame.addWidget(self.projectView)
         self.frame.addWidget(self.templateView)
