@@ -1,3 +1,3 @@
-pyinstaller -w -F --paths C:\Users\tom\AppData\Local\Programs\Python\Python35\Lib\site-packages\PyQt5\Qt\bin Downloads\hardware5000
+pyinstaller -w -F --paths C:\Users\tom\AppData\Local\Programs\Python\Python35\Lib\site-packages\PyQt5\Qt\bin Downloads\udtaoiviewer
 
 pip install --proxy=hoefliger\barrettt:pass@hhwsg4.hoefliger.de:8080 package
