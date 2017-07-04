@@ -112,6 +112,9 @@ class udtAoiViewer(QMainWindow):
             self.checkAois(projectAoiRoot, templateAoiRoot)
             self.checkUdts(projectUdtRoot, templateUdtRoot)
 
+            self.projectView.setFocus()
+            self.templateView.setFocus()
+
     def checkAois(self, projectAoiRoot, templateAoiRoot):
             for i in range(projectAoiRoot.childCount()):
                 pChild = projectAoiRoot.child(i)
