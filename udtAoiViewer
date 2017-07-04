@@ -59,6 +59,7 @@ class udtAoiViewer(QMainWindow):
         if path:
             self.projectModel = TreeModel(path)
             self.projectView.setModel(self.projectModel)
+            self.projectView.expandAll()
 
     def openTemplate(self, f = None):
         if not f:
@@ -69,6 +70,7 @@ class udtAoiViewer(QMainWindow):
         if path:
             self.templateModel = TreeModel(path)
             self.templateView.setModel(self.templateModel)
+            self.templateView.expandAll()
 
     def highlight(self):
         if self.model:
