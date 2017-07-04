@@ -141,32 +141,35 @@ class udtAoiViewer(QMainWindow):
             for i in range(projectUdtRoot.childCount()):
                 pChild = projectUdtRoot.child(i)
                 good = False
+                memsGood = True
                 for j in range(templateUdtRoot.childCount()):
                     tChild = templateUdtRoot.child(j)
                     if pChild.data(0) == tChild.data(0):
-                        self.checkMembers(tChild, pChild)
+                        memsGood = self.checkMembers(tChild, pChild)
                         if pChild.data(1) == tChild.data(1):
                             if pChild.data(2) == tChild.data(2):
                                 good = True
 
-                if not good:
+                if not good or not memsGood:
                     pChild.giveRed(True)
 
             for i in range(templateUdtRoot.childCount()):
                 tChild = templateUdtRoot.child(i)
                 good = False
+                memsGood = True
                 for j in range(projectUdtRoot.childCount()):
                     pChild = projectUdtRoot.child(j)
                     if pChild.data(0) == tChild.data(0):
-                        self.checkMembers(tChild, pChild)
+                        memsGood = self.checkMembers(tChild, pChild)
                         if pChild.data(1) == tChild.data(1):
                             if pChild.data(2) == tChild.data(2):
                                 good = True
 
-                if not good:
+                if not good or not memsGood:
                     tChild.giveRed(True)
 
     def checkMembers(self, tUdt, pUdt):
+        memsGood = True
         for i in range(tUdt.childCount()):
             tMem = tUdt.child(i)
             good = False
@@ -179,6 +182,7 @@ class udtAoiViewer(QMainWindow):
 
             if not good:
                 tMem.giveRed(True)
+                memsGood = False
 
         for i in range(pUdt.childCount()):
             pMem = pUdt.child(i)
@@ -192,6 +196,9 @@ class udtAoiViewer(QMainWindow):
 
             if not good:
                 pMem.giveRed(True)
+                memsGood = False
+
+        return memsGood
 
 app = QApplication(sys.argv)
 masterView = udtAoiViewer()
