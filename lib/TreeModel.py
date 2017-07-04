@@ -76,13 +76,13 @@ class TreeModel(QAbstractItemModel):
         if role == Qt.BackgroundRole:
             if self.isHighlighted:
                 if item.red:
-                    return QBrush(QColor(159,87,85))
+                    return QBrush(Qt.red)
             if item.depth == 0:
-                return QBrush(QColor(157,159,85))
+                return QBrush(QColor(187,187,187))
             if item.depth == 1:
-                return QBrush(QColor(85,157,159))
+                return QBrush(QColor(204,204,204))
             if item.depth == 2:
-                return QBrush(QColor(85,120,159))
+                return QBrush(Qt.transparent)
 
         if role != Qt.DisplayRole:
             return None

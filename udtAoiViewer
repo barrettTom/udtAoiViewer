@@ -48,6 +48,11 @@ class udtAoiViewer(QMainWindow):
         syncButton.triggered.connect(self.toggleSync)
         viewMenu.addAction(syncButton)
 
+        excoButton = QAction("&Expand/Collapse All", self)
+        excoButton.triggered.connect(self.toggleExco)
+        viewMenu.addAction(excoButton)
+        self.expanded = False
+
         self.syncScrolled = False
         self.templateView.verticalScrollBar().valueChanged.connect(lambda : self.syncScroll("t"))
         self.projectView.verticalScrollBar().valueChanged.connect(lambda : self.syncScroll("p"))
@@ -67,7 +72,6 @@ class udtAoiViewer(QMainWindow):
         if path:
             self.projectModel = TreeModel(path)
             self.projectView.setModel(self.projectModel)
-            self.projectView.expandAll()
 
     def openTemplate(self, f = None):
         if not f:
@@ -78,10 +82,18 @@ class udtAoiViewer(QMainWindow):
         if path:
             self.templateModel = TreeModel(path)
             self.templateView.setModel(self.templateModel)
-            self.templateView.expandAll()
 
     def toggleSync(self):
         self.syncScrolled = not self.syncScrolled
+
+    def toggleExco(self):
+        self.expanded = not self.expanded
+        if self.expanded:
+            self.templateView.expandAll()
+            self.projectView.expandAll()
+        else:
+            self.templateView.collapseAll()
+            self.projectView.collapseAll()
 
     def syncScroll(self, view):
         if self.syncScrolled:
@@ -132,10 +144,10 @@ class udtAoiViewer(QMainWindow):
                 for j in range(templateUdtRoot.childCount()):
                     tChild = templateUdtRoot.child(j)
                     if pChild.data(0) == tChild.data(0):
+                        self.checkMembers(tChild, pChild)
                         if pChild.data(1) == tChild.data(1):
                             if pChild.data(2) == tChild.data(2):
                                 good = True
-                                self.checkMembers(tChild, pChild)
 
                 if not good:
                     pChild.giveRed(True)
@@ -146,10 +158,10 @@ class udtAoiViewer(QMainWindow):
                 for j in range(projectUdtRoot.childCount()):
                     pChild = projectUdtRoot.child(j)
                     if pChild.data(0) == tChild.data(0):
+                        self.checkMembers(tChild, pChild)
                         if pChild.data(1) == tChild.data(1):
                             if pChild.data(2) == tChild.data(2):
                                 good = True
-                                self.checkMembers(tChild, pChild)
 
                 if not good:
                     tChild.giveRed(True)
