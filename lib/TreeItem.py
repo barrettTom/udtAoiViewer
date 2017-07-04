@@ -3,8 +3,9 @@ class TreeItem(object):
         self.parentItem = parent
         self.childItems = []
         self.depth = depth
+        self.red = False
 
-        self.itemData = ["","","",""]
+        self.itemData = ["","",""]
         for i, d in enumerate(data):
             self.itemData[i] = d
         self.itemData = tuple(self.itemData)
@@ -39,3 +40,6 @@ class TreeItem(object):
     def row(self):
         if self.parentItem:
             return self.parentItem.childItems.index(self)
+
+    def giveRed(self, red):
+        self.red = red

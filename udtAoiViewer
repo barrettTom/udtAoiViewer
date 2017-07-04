@@ -44,6 +44,14 @@ class udtAoiViewer(QMainWindow):
         highlightButton.triggered.connect(self.highlight)
         viewMenu.addAction(highlightButton)
 
+        syncButton = QAction("&Sync Scroll", self)
+        syncButton.triggered.connect(self.toggleSync)
+        viewMenu.addAction(syncButton)
+
+        self.syncScrolled = False
+        self.templateView.verticalScrollBar().valueChanged.connect(lambda : self.syncScroll("t"))
+        self.projectView.verticalScrollBar().valueChanged.connect(lambda : self.syncScroll("p"))
+
         if len(sys.argv) == 3:
             self.openTemplate(sys.argv[1])
             self.openProject(sys.argv[2])
@@ -72,9 +80,106 @@ class udtAoiViewer(QMainWindow):
             self.templateView.setModel(self.templateModel)
             self.templateView.expandAll()
 
+    def toggleSync(self):
+        self.syncScrolled = not self.syncScrolled
+
+    def syncScroll(self, view):
+        if self.syncScrolled:
+            if view == "t":
+                sliderValue = self.templateView.verticalScrollBar().value()
+                self.projectView.verticalScrollBar().setValue(sliderValue)
+            elif view == "p":
+                sliderValue = self.projectView.verticalScrollBar().value()
+                self.templateView.verticalScrollBar().setValue(sliderValue)
+
     def highlight(self):
-        if self.model:
-            self.model.highlight()
+        if self.projectModel and self.templateModel:
+            projectUdtRoot, projectAoiRoot = self.projectModel.highlight()
+            templateUdtRoot, templateAoiRoot = self.templateModel.highlight()
+
+            self.checkAois(projectAoiRoot, templateAoiRoot)
+            self.checkUdts(projectUdtRoot, templateUdtRoot)
+
+    def checkAois(self, projectAoiRoot, templateAoiRoot):
+            for i in range(projectAoiRoot.childCount()):
+                pChild = projectAoiRoot.child(i)
+                good = False
+                for j in range(templateAoiRoot.childCount()):
+                    tChild = templateAoiRoot.child(j)
+                    if pChild.data(0) == tChild.data(0):
+                        if pChild.data(1) == tChild.data(1):
+                            if pChild.data(2) == tChild.data(2):
+                                good = True
+                if not good:
+                    pChild.giveRed(True)
+
+            for i in range(templateAoiRoot.childCount()):
+                tChild = templateAoiRoot.child(i)
+                good = False
+                for j in range(projectAoiRoot.childCount()):
+                    pChild = projectAoiRoot.child(j)
+                    if pChild.data(0) == tChild.data(0):
+                        if pChild.data(1) == tChild.data(1):
+                            if pChild.data(2) == tChild.data(2):
+                                good = True
+                if not good:
+                    tChild.giveRed(True)
+
+    def checkUdts(self, projectUdtRoot, templateUdtRoot):
+            for i in range(projectUdtRoot.childCount()):
+                pChild = projectUdtRoot.child(i)
+                good = False
+                for j in range(templateUdtRoot.childCount()):
+                    tChild = templateUdtRoot.child(j)
+                    if pChild.data(0) == tChild.data(0):
+                        if pChild.data(1) == tChild.data(1):
+                            if pChild.data(2) == tChild.data(2):
+                                good = True
+                                self.checkMembers(tChild, pChild)
+
+                if not good:
+                    pChild.giveRed(True)
+
+            for i in range(templateUdtRoot.childCount()):
+                tChild = templateUdtRoot.child(i)
+                good = False
+                for j in range(projectUdtRoot.childCount()):
+                    pChild = projectUdtRoot.child(j)
+                    if pChild.data(0) == tChild.data(0):
+                        if pChild.data(1) == tChild.data(1):
+                            if pChild.data(2) == tChild.data(2):
+                                good = True
+                                self.checkMembers(tChild, pChild)
+
+                if not good:
+                    tChild.giveRed(True)
+
+    def checkMembers(self, tUdt, pUdt):
+        for i in range(tUdt.childCount()):
+            tMem = tUdt.child(i)
+            good = False
+            for j in range(pUdt.childCount()):
+                pMem = pUdt.child(j)
+                if pMem.data(0) == tMem.data(0):
+                    if pMem.data(1) == tMem.data(1):
+                        if pMem.data(2) == tMem.data(2):
+                            good = True
+
+            if not good:
+                tMem.giveRed(True)
+
+        for i in range(pUdt.childCount()):
+            pMem = pUdt.child(i)
+            good = False
+            for j in range(tUdt.childCount()):
+                tMem = tUdt.child(j)
+                if pMem.data(0) == tMem.data(0):
+                    if pMem.data(1) == tMem.data(1):
+                        if pMem.data(2) == tMem.data(2):
+                            good = True
+
+            if not good:
+                pMem.giveRed(True)
 
 app = QApplication(sys.argv)
 masterView = udtAoiViewer()

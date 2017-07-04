@@ -4,6 +4,8 @@ import lxml.etree as ET
 
 from lib.TreeItem import TreeItem
 
+MAX_STRING = 40
+
 class TreeModel(QAbstractItemModel):
     def __init__(self, path, parent=None):
         super(TreeModel, self).__init__(parent)
@@ -72,6 +74,9 @@ class TreeModel(QAbstractItemModel):
         item = index.internalPointer()
 
         if role == Qt.BackgroundRole:
+            if self.isHighlighted:
+                if item.red:
+                    return QBrush(QColor(159,87,85))
             if item.depth == 0:
                 return QBrush(QColor(157,159,85))
             if item.depth == 1:
@@ -86,6 +91,7 @@ class TreeModel(QAbstractItemModel):
 
     def highlight(self):
         self.isHighlighted = not self.isHighlighted
+        return self.udtItem, self.aoiItem
 
     def setupModel(self, path):
         self.parser = ET.XMLParser(strip_cdata=False, resolve_entities=False)
@@ -122,7 +128,9 @@ class TreeModel(QAbstractItemModel):
         for udt in self.root.iter("DataType"):
             desc = udt.findall("Description")
             if desc:
-                desc = desc[0]
+                desc = desc[0].text
+                if len(desc) > MAX_STRING:
+                    desc = desc[:MAX_STRING]+"..."
             else:
                 desc = ""
 
@@ -131,7 +139,9 @@ class TreeModel(QAbstractItemModel):
             for member in members:
                 mdes = member.findall("Description")
                 if mdes:
-                    mdes = mdes[0]
+                    mdes = mdes[0].text
+                    if len(mdes) > MAX_STRING:
+                        mdes = mdes[:MAX_STRING]+"..."
                 else:
                     mdes = ""
                 mems.append({'name' : member.attrib['Name'],
